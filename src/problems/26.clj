@@ -5,4 +5,6 @@
     (repeat n 1)
     (let
       [prev (fib (dec n))]
-      (conj (+ (first prev) (second prev)) (reverse prev)))))
+      (concat prev (list (+ (first prev) (second prev)))))))
+
+(fib 2)
