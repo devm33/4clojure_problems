@@ -1,10 +1,10 @@
 (ns problems.26)
 
 (defn fib [n]
-  (if (< n 2)
-    (repeat n 1)
-    (let
-      [prev (fib (dec n))]
-      (concat prev (list (+ (first prev) (second prev)))))))
+    (if (< n 3)
+      (repeat n 1)
+      (let
+        [prev (reverse (fib (dec n)))]
+        (reverse (conj prev (+ (first prev) (second prev)))))))
 
-(fib 2)
+(fib  5)
