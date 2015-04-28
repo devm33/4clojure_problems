@@ -2,8 +2,10 @@
 
 ; longest increasing sub-sequence
 
-(def example [1 0 1 2 3 0 4 5])
+;(def example [1 2 0 1 2 3 0 4 5])
 ;(def example [7 6 5 4])
+;(def example [5 6 1 3 2 7])
+(def example [2 3 3 4 5])
 
 (defn takeincr [coll]
   (if (empty? coll)
@@ -29,11 +31,20 @@
 
 ; now mash it all together for 4clojure.com
 
-(defn takeallincr [coll]
-  (when-let [s (seq coll)]
-    (loop [xs (rest s) cur [(first s)]]
-      (if (empty? xs)
-        cur
-        (if (< (last cur) (first xs))
+(defn mxncr [coll]
+  (let
+    [maxsub (apply max-key count
+    (reverse (loop [ s (seq coll) res [] ]
+      (if (empty? s)
+        res
+        (let
+          [group
+           (loop [xs (next s) cur [(first s)]]
+             (if (or (empty? xs) (>= (last cur) (first xs)))
+               [xs cur]
+               (recur (rest xs) (conj cur (first xs)))))]
+          (recur (first group) (conj res (second group))))))))]
+    (if (< (count maxsub) 2) [] maxsub)))
 
-(println (mxncr example))
+
+(println (str "final " (mxncr example)))
