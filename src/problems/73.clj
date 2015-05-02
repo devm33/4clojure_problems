@@ -5,14 +5,10 @@
     [checkxo (fn [pred] (if (pred :x) :x (if (pred :o) :o nil)))
      alleq (fn [c coll] (apply = c coll))
      hasgroupeq (fn [c groups] (some (partial alleq c) groups))
-     cols (apply map vector rows)]
-    (if-let [res (checkxo #((or (hasgroupeq % rows) (hasgroupeq % cols))))]
-      res
-      (let [d (map-indexed #(nth %2 %1) rows)]
-        (if-let [resd (checkxo #(alleq % d))]
-          resd
-          (let [bd (map-indexed #(nth %2 (- (dec (count (first rows))) %1)) rows)]
-            (checkxo #(alleq % bd))))))))
+     cols (apply map vector rows)
+     diag (map-indexed #(nth %2 %1) rows)
+     bdiag (map-indexed #(nth %2 (- (dec (count (first rows))) %1)) rows)]
+    (checkxo #(hasgroupeq % (concat rows cols [diag bdiag])))))
 
 
 (assert (= nil (__ [[:e :e :e]
