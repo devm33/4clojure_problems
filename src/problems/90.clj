@@ -5,8 +5,8 @@
 (def __
   (fn [a b]
     (reduce
-      (fn [l ai]
-        (apply conj l (reduce #(conj %1 [ai %2]) [] b)))
+      (fn [s ai]
+        (apply conj s (map #(vector ai %) b)))
       #{} a))
   )
 
