@@ -7,11 +7,22 @@
 ; simple bfs soln
 
 (defn __ [maze]
-  (loop [visited #{}
-         queue (list (let [r (some #(when (.contains % "M") %) maze)]
-                       (vector (.indexOf maze r) (.indexOf r "M"))))]
+  (letfn [(get_maze_at [[r c]]
+            (when (and (< -1 r (count maze)) (< -1 c (count (nth maze r))))
+              (nth (nth maze r) c)))]
+    (loop [visited #{}
+           queue (list (let [r (some #(when (.contains % "M") %) maze)]
+                         (vector (.indexOf maze r) (.indexOf r "M"))))]
+      (if (empty? queue) false
+        (let [cur (last queue)]
+          (if (= \C (get_maze_at cur)) true
+            (recur
+              (conj visited cur)
+              (drop queue)
 
-    ))
+              ; TODO add neighbors to queue
+
+                   )))))))
 
 
 (def test-maze ["#######"
