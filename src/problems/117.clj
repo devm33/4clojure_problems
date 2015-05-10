@@ -18,7 +18,7 @@
           (if (= \C (get_maze_at cur)) true
             (recur
               (conj visited cur)
-              (drop queue)
+              (butlast queue)
 
               ; TODO add neighbors to queue
 
