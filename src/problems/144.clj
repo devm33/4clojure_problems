@@ -6,3 +6,6 @@
 (def __ osc)
 
 (take 3 (__ 3.14 int double))
+
+; way better soln
+(fn [v & f] (reductions #(%2 %) v (cycle f)))
