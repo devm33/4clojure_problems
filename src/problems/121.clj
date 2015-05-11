@@ -12,3 +12,5 @@
     (eval sexp)))
 
 (letlit '(+ x 1) '{x 1})
+
+; see repl example here maybe https://clojuredocs.org/clojure.core/-%3E
