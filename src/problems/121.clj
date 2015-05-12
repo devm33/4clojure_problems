@@ -1,16 +1,12 @@
 (ns problems.121)
 
-(defn __ [sexp vars]
-  )
+; no warning, but can't use eval
 
+(defn __ [sexp]
+  (fn [vars]
+    (eval (map #(get vars % %) sexp))))
 
-(eval '(+ 2 2))
+((__ '(/ a b)) '{a 16 b 8})
 
-
-(defn letlit [sexp vars]
-  (let [{:syms (keys vars)} vars]
-    (eval sexp)))
-
-(letlit '(+ x 1) '{x 1})
 
 ; see repl example here maybe https://clojuredocs.org/clojure.core/-%3E
