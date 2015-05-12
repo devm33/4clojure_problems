@@ -2,11 +2,15 @@
 
 ; no warning, but can't use eval
 
-(defn __ [sexp]
-  (fn [vars]
-    (eval (map #(get vars % %) sexp))))
+(defn __ [s]
+  (let [fmap {'/ / '* * '+ + '- -}
+        collf (fn [f x] (if (coll? x) (f x) x))]
+    ((fn call [[o a b]] ((fmap o) (collf call a) (collf call b))) s)))
 
-((__ '(/ a b)) '{a 16 b 8})
+
+(assert (= 6 (__ '(+ 4 2))))
+
+(assert (= 4 (__ '(+ (/ 4 2) 2))))
 
 
-; see repl example here maybe https://clojuredocs.org/clojure.core/-%3E
+
