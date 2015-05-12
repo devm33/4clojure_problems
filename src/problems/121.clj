@@ -1,16 +1,25 @@
 (ns problems.121)
 
-; no warning, but can't use eval
+; no warning, but can't use eval or resolve
 
 (defn __ [s]
-  (let [fmap {'/ / '* * '+ + '- -}
-        collf (fn [f x] (if (coll? x) (f x) x))]
-    ((fn call [[o a b]] ((fmap o) (collf call a) (collf call b))) s)))
+  (let [fmap {'/ / '* * '+ + '- -}]
+    (fn [v]
+      ((fn call [[o & a]]
+         (apply (fmap o) (map #(if (coll? %) (call %) (get v % %)) a))) s))))
 
+(assert (= 2 ((__ '(/ a b))
+              '{b 8 a 16})))
 
-(assert (= 6 (__ '(+ 4 2))))
+(assert (= 8 ((__ '(+ a b 2)) '{a 2 b 4})))
 
-(assert (= 4 (__ '(+ (/ 4 2) 2))))
+(assert (= [6 0 -4]
+           (map (__ '(* (+ 2 a)
+                        (- 10 b)))
+                '[{a 1 b 8}
+                  {b 5 a -2}
+                  {a 2 b 11}])))
 
-
-
+(assert (= 1 ((__ '(/ (+ x 2)
+                      (* 3 (+ y 1))))
+              '{x 4 y 1})))
