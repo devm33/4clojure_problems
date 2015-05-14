@@ -4,12 +4,13 @@
 
 (def __
 
-  (fn (let [a "(fn (let [a " b ""] (str a \" a "b \"" b b)))
+  (fn [] (let [a "(fn [] (let [a "b"] (clojure.string/join \" [a a \b b b])))"]
+           (clojure.string/join \" [a a \b b b])))
 
   )
 
 
-(println (str '__))
+(println (__))
 
-(= (str '__) (__))
+
 
