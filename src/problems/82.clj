@@ -40,7 +40,7 @@
                           (if (or feq ashort) (rest bs) bs)
                           (if feq d (inc d))))))))))]
     (letfn [(find-neighbor [n xs] (some #(when (neighbors? % n) %) xs))]
-      (let [fw (first words)]
+      (let [fw (rand-nth (seq words))]
         (loop [fst fw lst fw xs (disj words fw)]
           (if (empty? xs)
             true
