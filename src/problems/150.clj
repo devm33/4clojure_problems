@@ -4,7 +4,7 @@
 ; breaking at 99 -> 101 (getting 1001)
 
 (def __
-  (letfn [(numseq [n] (map #(read-string (str %)) (str n)))
+  (letfn [(numseq [n] (seq (str n)))
           (seqnum [s] (read-string (apply str s)))
           (palin? [s] (if (empty? s) true
                         (when (= (first s) (last s))
@@ -17,8 +17,10 @@
                                                     (str (quot n 10)))))))
           (nextpal [n] (let [nseq (numseq n)
                              finc (inc (seqnum (fsthalf nseq)))
-                             npal (if (even? (count nseq))
-                                    (mirror-even finc) (mirror-odd finc))]
+                             npal (if (apply = \9 nseq)
+                                    (+ 2 n) ; special case for all 9
+                                    (if (even? (count nseq))
+                                      (mirror-even finc) (mirror-odd finc)))]
                          (println n finc npal)
                          (lazy-seq (cons npal (nextpal npal)))))]
     (fn [start]
