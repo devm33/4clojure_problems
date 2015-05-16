@@ -1,5 +1,8 @@
 (ns problems.150)
 
+; breaking at 9 -> 11 (getting 10)
+; breaking at 99 -> 101 (getting 1001)
+
 (def __
   (letfn [(numseq [n] (map #(read-string (str %)) (str n)))
           (seqnum [s] (read-string (apply str s)))
