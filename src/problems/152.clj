@@ -30,15 +30,14 @@
 (defn nsubsqs [sq n]
   (if (= n (count sq))
     (if (latin? sq) 1 0)
-    (->>
-      (for [r (range (- (count sq) n))
-            c (range (- (count sq) n))]
-        (map #(take n %) (take n sq)))
-      (filter latin?)
-      count)))
+    (count
+      (for [r (range (inc (- (count sq) n)))
+            c (range (inc (- (count sq) n)))
+            :let [m (map #(take n (drop c %)) (take n (drop r sq)))]
+            :when (latin? m)] 1))))
 
-(assert (= 1 (subsqs ft-sq 4)))
-(assert (= 4 (subsqs ft-sq 2)))
+(assert (= 1 (nsubsqs ft-sq 4)))
+(assert (= 4 (nsubsqs ft-sq 2)))
 
 ; return a mapping of sizes to counts of latin subsquares
 (defn sqmap [sq]
@@ -48,4 +47,5 @@
     (filter #(-> % second (not= 0)))
     (into {})))
 
-(sqmap ft-sq)
+(assert (= {4 1 2 4} (sqmap ft-sq)))
+
