@@ -27,7 +27,7 @@
 
 
 ; return the number of latin subsquares of size n
-(defn nsubsqs [sq n]
+(defn nsqs [sq n]
   (if (= n (count sq))
     (if (latin? sq) 1 0)
     (count
@@ -36,16 +36,37 @@
             :let [m (map #(take n (drop c %)) (take n (drop r sq)))]
             :when (latin? m)] 1))))
 
-(assert (= 1 (nsubsqs ft-sq 4)))
-(assert (= 4 (nsubsqs ft-sq 2)))
+(assert (= 1 (nsqs ft-sq 4)))
+(assert (= 4 (nsqs ft-sq 2)))
 
 ; return a mapping of sizes to counts of latin subsquares
-(defn sqmap [sq]
+(defn nsqmap [sq]
   (->>
     (range 2 (inc (count sq)))
-    (map #(vector % (nsubsqs sq %)))
+    (map #(vector % (nsqs sq %)))
     (filter #(-> % second (not= 0)))
     (into {})))
 
-(assert (= {4 1 2 4} (sqmap ft-sq)))
+(assert (= {4 1 2 4} (nsqmap ft-sq)))
+
+; return all sub-squares of vectors (accounting for shifting)
+
+; note: warning, concerned about double counting, may need to modify nsqmap, nsqs
+
+(defn subsqs [vs]
+  (->>
+    (filter #(> 1 (count %)) vs)
+    ; TODO
+    ))
+
+(def dr-sq [[1]
+            [1 2 1 2]
+            [2 1 2 1]
+            [1 2 1 2]
+            []       ]) ; { 2 2 }
+
+(def sh-sq [[3 1 2]
+            [1 2 3 1 3 4]
+            [2 3 1 3]    ]) ; { 3 1, 2 2 }
+
 
