@@ -63,21 +63,21 @@
 ; return all sub-squares of vectors (accounting for shifting)
 
 (defn __ [vs]
-  (let [rs (filter #(< 1 (count %)) vs)]
+  (let [rs (filter #(< 1 (count %)) vs)
+        max-col (apply max (map count vs))]
     (reduce
       (fn [m n]
         (let
           [c-n
            (->>
              (for [r (range (inc (- (count rs) n)))
-                   :let [rows (take n (drop r rs))
-                         max-col-sub (apply max (map count rows))]
+                   :let [rows (take n (drop r rs))]
                    :when (every? #(<= n (count %)) rows)
                    c (range (inc (- (apply max (map count rows)) n)))]
                (reduce
                  (fn [rets row]
                    (mapcat
-                     #(for [coff (range (inc (- max-col-sub (count row))))
+                     #(for [coff (range (inc (- max-col (count row))))
                             :when (< -1 (- c coff) (inc (- (count row) n)))
                             :let [subrow (take n (drop (- c coff) row))]]
                         (concat % (vector subrow))) rets))
@@ -88,7 +88,7 @@
                                   (concat % (apply map vector %)))))
              distinct count)]
           (if (< 0 c-n) (assoc m n c-n) m)))
-      {} (range 2 (inc (apply max (map count vs)))))))
+      {} (range 2 (inc max-col)))))
 
 
 (assert (= (__ '[[A B C D]
@@ -134,13 +134,6 @@
                 [1 2 3 1 3 4]
                 [2 3 1 3]    ])
            {3 1, 2 2}))
-
-(println (__ [[8 6 7 3 2 5 1 4]
-              [6 8 3 7]
-              [7 3 8 6]
-              [3 7 6 8 1 4 5 2]
-              [1 8 5 2 4]
-              [8 1 2 4 5]]))
 
 (assert (= (__ [[8 6 7 3 2 5 1 4]
                 [6 8 3 7]
