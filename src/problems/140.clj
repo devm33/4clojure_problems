@@ -1,43 +1,59 @@
 (ns problems.140)
 
-(def f-test #{#{'a 'B 'C 'd}
-              #{'A 'b 'c 'd}
-              #{'A 'b 'c 'D}
-              #{'A 'b 'C 'd}
-              #{'A 'b 'C 'D}
-              #{'A 'B 'c 'd}
-              #{'A 'B 'c 'D}
-              #{'A 'B 'C 'd}})
-
 (defn __ [eqs]
-  (let [notmap (#(reduce (fn [m [k v]] (assoc m v k)) % %)
-                         '{a A b B c C d D})
-        combine (memoize
-                  (fn [s1 s2]
-                    (reduce
-                      (fn [res item]
-                        (if (contains? res (notmap item))
-                          (disj res item (notmap item))
-                          (conj res item)))
-                      #{} (apply conj s1 s2))))
-        oneoff? (fn [s1 s2]
-                 (let [c (combine s1 s2)]
-                   (when (< (count c) (min (count s1) (count s1))) c)))
-        ]
-    (loop [in eqs]
-      (let
-        [nin
-         (loop [s (seq in) out #{}]
-           (if (empty? s) out
-             (recur
-               (rest s)
-               (let
-                 [combined
-                  (->> (rest s) (map #(oneoff? (first s) %)) (filter nil?))]
-                 (if (empty? combined)
-                   (conj out (first s))
-                   (apply conj out combined))))))]
-        (if (= (count in) (count nin)) nin
-          (recur nin))))))
+  (let
+    [notmap (#(reduce (fn [m [k v]] (assoc m v k)) % %)
+                      '{a A b B c C d D})
+     oneoff? #(let [a (apply disj %1 %2) b (apply disj %2 %1)]
+                (when (and (= 1 (count a) (count b)) (= (notmap (first a)) (first b)))
+                  (disj %1 (first a))))
+     combine (fn [sets]
+               (loop [s (seq sets) out sets]
+                 (if (empty? s) out
+                   (recur
+                     (rest s)
+                     (let [s1 (first s)]
+                       (reduce
+                         #(if-let [c (oneoff? s1 %2)] (conj (disj %1 s1 %2) c)
+                            %1)
+                         out (rest s)))))))
+     converge (fn [f v] (let [nv (f v)] (if (= v nv) nv (recur f nv))))
+     covers? (fn [sets]
+               (every? (fn [s] (some #(empty? (apply disj % s)) sets)) eqs))
+     minimize (fn [sets]
+                (let [covering-sets (for [s (seq sets)
+                                          :let [sets-s (disj sets s)]
+                                          :when (covers? sets-s)]
+                                      sets-s)]
+                  (case (count covering-sets)
+                    0 sets
+                    1 (first covering-sets)
+                    (apply min-key count covering-sets))))]
+    (minimize (converge combine eqs))))
 
-(__ f-test)
+(assert (= (__ #{#{'a 'B 'C 'd}
+                 #{'A 'b 'c 'd}
+                 #{'A 'b 'c 'D}
+                 #{'A 'b 'C 'd}
+                 #{'A 'b 'C 'D}
+                 #{'A 'B 'c 'd}
+                 #{'A 'B 'c 'D}
+                 #{'A 'B 'C 'd}})
+           #{#{'A 'c} 
+             #{'A 'b}
+             #{'B 'C 'd}}))
+
+(assert (= (__ #{#{'A 'B 'C 'D}
+                 #{'A 'B 'C 'd}})
+           #{#{'A 'B 'C}}))
+
+(assert (= (__ #{#{'a 'b 'c 'd}
+                 #{'a 'B 'c 'd}
+                 #{'a 'b 'c 'D}
+                 #{'a 'B 'c 'D}
+                 #{'A 'B 'C 'd}
+                 #{'A 'B 'C 'D}
+                 #{'A 'b 'C 'd}
+                 #{'A 'b 'C 'D}})
+           #{#{'a 'c}
+             #{'A 'C}}))
